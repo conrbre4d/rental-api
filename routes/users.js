@@ -118,6 +118,41 @@ router.post("/login", async (req, res) => {
     }
 });
 
+// POST /user/debugLogin
+router.post("/debugLogin", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await db("users").where("email", email).first();
+
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({
+                error: true,
+                message: "Incorrect email or password"
+            });
+        }
+
+        const token = jwt.sign(
+            { email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "1s" }
+        );
+
+        res.json({
+            token,
+            tokenType: "Bearer",
+            expiresIn: 1
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: true,
+            message: "Database error"
+        });
+    }
+});
+
 // GET /user/test-auth
 router.get("/test-auth", auth, async (req, res) => {
 
