@@ -88,6 +88,17 @@ router.get("/:id", async (req, res) => {
             });
         }
 
+        const reviews = await db("ratings")
+            .where("rentalId", req.params.id)
+            .select(
+                "rating",
+                "userEmail as user",
+                "comment",
+                "dateTime"
+            );
+
+        rental.reviews = reviews;
+
         res.json(rental);
 
     } catch (error) {
