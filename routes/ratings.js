@@ -116,4 +116,27 @@ router.get("/", auth, async (req, res) => {
     }
 });
 
+// POST /ratings/debugEraseRatings
+router.post("/debugEraseRatings", async (req, res) => {
+
+    try {
+
+        // delete every row in ratings table
+        await db("ratings").del();
+
+        res.json({
+            message: "All ratings successfully erased."
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            error: true,
+            message: "Database error"
+        });
+    }
+});
+
 module.exports = router;
