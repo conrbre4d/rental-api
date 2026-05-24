@@ -99,6 +99,29 @@ router.get("/:id", async (req, res) => {
 
         rental.reviews = reviews;
 
+        // get all ratings for this rental
+        const ratings = await db("ratings")
+            .where("rentalId", req.params.id);
+
+        // number of ratings
+        rental.numRatings = ratings.length;
+
+        // calculate average rating
+        if (ratings.length > 0) {
+
+            let total = 0;
+
+            for (const r of ratings) {
+                total += r.rating;
+            }
+
+            rental.averageRating = total / ratings.length;
+
+        } else {
+
+            rental.averageRating = null;
+        }
+
         res.json(rental);
 
     } catch (error) {
