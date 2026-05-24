@@ -85,4 +85,35 @@ router.get("/rentals/:id", auth, async (req, res) => {
     }
 });
 
+// GET /ratings
+router.get("/", auth, async (req, res) => {
+
+    try {
+
+        // get ratings for logged-in user
+        const ratings = await db("ratings")
+            .where("userEmail", req.user.email)
+            .select(
+                "rentalId",
+                "rating",
+                "comment",
+                "dateTime"
+            );
+
+        // send ratings
+        res.json({
+            data: ratings
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            error: true,
+            message: "Database error"
+        });
+    }
+});
+
 module.exports = router;
