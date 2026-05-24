@@ -6,6 +6,7 @@ const PORT = 3000;
 
 const rentalsRoutes = require("./routes/rentals");
 const usersRoutes = require("./routes/users");
+const ratingsRoutes = require("./routes/ratings");
 
 app.use(express.json());
 
@@ -32,6 +33,7 @@ app.get("/test-db", async (req, res) => {
 
 app.use("/rentals", rentalsRoutes);
 app.use("/user", usersRoutes);
+app.use("/ratings", ratingsRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
