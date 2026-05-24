@@ -6,7 +6,7 @@ const auth = require("../middleware/auth");
 
 // POST /ratings/rentals/:id
 router.post("/rentals/:id", auth, async (req, res) => {
-
+    
     try {
 
         const rentalId = req.params.id;
@@ -46,6 +46,38 @@ router.post("/rentals/:id", auth, async (req, res) => {
 
         console.error(error);
 
+        res.status(500).json({
+            error: true,
+            message: "Database error"
+        });
+    }
+});
+
+// GET /ratings/rentals/:id
+router.get("/rentals/:id", auth, async (req, res) => {
+    
+    try {
+        // find rating using rental id and logged-in user email
+        const rating = await db("ratings")
+            .where({
+                rentalId: req.params.id,
+                userEmail: req.user.email
+            })
+            .first();
+
+        if (!rating) {
+            return res.json({});
+        }
+
+        // send rating data
+        res.json({
+            rating: rating.rating,
+            comment: rating.comment,
+            dateTime: rating.dateTime
+        });
+
+    } catch (error) {
+        console.error(error);
         res.status(500).json({
             error: true,
             message: "Database error"
