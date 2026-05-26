@@ -85,11 +85,16 @@ router.get("/rentals/:id", auth, async (req, res) => {
         }
 
         // send rating data
-        res.json({
+        const response = {
             rating: rating.rating,
-            comment: rating.comment,
             dateTime: rating.dateTime
-        });
+        };
+
+        if (rating.comment) {
+            response.comment = rating.comment;
+        }
+
+        res.json(response);
 
     } catch (error) {
         console.error(error);
@@ -115,9 +120,34 @@ router.get("/", auth, async (req, res) => {
                 "dateTime"
             );
 
-        // send ratings
+        // remove comment field if no comment exists
+        const cleanedRatings = ratings.map(r => {
+
+            const ratingObj = {
+                rentalId: r.rentalId,
+                rating: r.rating,
+                dateTime: r.dateTime
+            };
+
+            if (r.comment) {
+                ratingObj.comment = r.comment;
+            }
+
+            return ratingObj;
+        });
+
         res.json({
-            data: ratings
+            data: cleanedRatings,
+            pagination: {
+                total: cleanedRatings.length,
+                lastPage: 1,
+                prevPage: null,
+                nextPage: null,
+                perPage: 20,
+                currentPage: 1,
+                from: 0,
+                to: 20
+            }
         });
 
     } catch (error) {
