@@ -153,6 +153,68 @@ router.post("/debugLogin", async (req, res) => {
     }
 });
 
+// GET /user/:email/profile
+router.get("/:email/profile", async (req, res) => {
+    try {
+        const email = req.params.email;
+
+        const user = await db("users")
+            .where("email", email)
+            .first();
+
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                message: "User not found"
+            });
+        }
+
+        // default public profile
+        const profile = {
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName
+        };
+
+        // if Authorization header exists, check if user owns profile
+        const authHeader = req.headers.authorization;
+
+        if (authHeader) {
+            if (!authHeader.startsWith("Bearer ")) {
+                return res.status(401).json({
+                    error: true,
+                    message: "Authorization header is malformed"
+                });
+            }
+
+            try {
+                const token = authHeader.split(" ")[1];
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+                if (decoded.email === email) {
+                    profile.dob = user.dob;
+                    profile.address = user.address;
+                }
+
+            } catch (error) {
+                return res.status(401).json({
+                    error: true,
+                    message: "Invalid JWT token"
+                });
+            }
+        }
+
+        res.json(profile);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: true,
+            message: "Database error"
+        });
+    }
+});
+
 // GET /user/test-auth
 router.get("/test-auth", auth, async (req, res) => {
 
