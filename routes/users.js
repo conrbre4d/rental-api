@@ -192,7 +192,7 @@ router.get("/:email/profile", async (req, res) => {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
                 if (decoded.email === email) {
-                    profile.dob = user.dob;
+                    profile.dob = user.dob ? user.dob.toLocaleDateString("en-CA") : null;
                     profile.address = user.address;
                 }
 
