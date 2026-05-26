@@ -14,6 +14,21 @@ router.post("/rentals/:id", auth, async (req, res) => {
 
         const { rating, comment } = req.body;
 
+        // validate comment
+        if (
+            comment !== undefined &&
+            (
+                typeof comment !== "string" ||
+                comment.length < 1 ||
+                comment.length > 2000
+            )
+        ) {
+            return res.status(400).json({
+                error: true,
+                message: "Invalid comment parameter. Comment must be a string 1-2000 characters long."
+            });
+        }
+
         // check rating exists
         if (rating === undefined) {
             return res.status(400).json({
