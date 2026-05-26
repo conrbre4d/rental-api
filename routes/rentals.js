@@ -88,7 +88,7 @@ router.get("/:id", async (req, res) => {
             });
         }
 
-        const reviews = await db("ratings")
+        const reviewsRaw = await db("ratings")
             .where("rentalId", req.params.id)
             .select(
                 "rating",
@@ -96,6 +96,20 @@ router.get("/:id", async (req, res) => {
                 "comment",
                 "dateTime"
             );
+
+        const reviews = reviewsRaw.map(r => {
+            const reviewObj = {
+                rating: r.rating,
+                user: r.user,
+                dateTime: r.dateTime
+            };
+
+            if (r.comment) {
+                reviewObj.comment = r.comment;
+            }
+
+            return reviewObj;
+        });
 
         rental.reviews = reviews;
 
