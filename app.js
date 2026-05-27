@@ -8,7 +8,13 @@ const rentalsRoutes = require("./routes/rentals");
 const usersRoutes = require("./routes/users");
 const ratingsRoutes = require("./routes/ratings");
 
+const swaggerUI = require("swagger-ui-express");
+const swaggerDocument = require("./docs/swagger.json");
+
 app.use(express.json());
+
+app.use("/docs", swaggerUI.serve);
+app.get("/docs", swaggerUI.setup(swaggerDocument));
 
 app.get("/", (req, res) => {
     res.json({ message: "Rental API is running" });

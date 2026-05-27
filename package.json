@@ -19,6 +19,7 @@
     "jsonwebtoken": "^9.0.3",
     "knex": "^3.2.10",
     "mysql2": "^3.22.3",
+    "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
