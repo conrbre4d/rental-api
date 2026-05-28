@@ -5,6 +5,15 @@ const db = require("../database/db");
 // GET /rentals/states
 router.get("/states", async (req, res) => {
     try {
+        const queryParams = Object.keys(req.query);
+
+        if (queryParams.length > 0) {
+            return res.status(400).json({
+                error: true,
+                message: `Invalid query parameters: ${queryParams.join(", ")}`
+            });
+        }
+
         const states = await db("data")
             .distinct("state")
             .whereNotNull("state")
@@ -23,6 +32,16 @@ router.get("/states", async (req, res) => {
 // GET /rentals/property-types
 router.get("/property-types", async (req, res) => {
     try {
+
+        const queryParams = Object.keys(req.query);
+
+        if (queryParams.length > 0) {
+            return res.status(400).json({
+                error: true,
+                message: `Invalid query parameters: ${queryParams.join(", ")}`
+            });
+        }
+
         const types = await db("data")
             .distinct("propertyType")
             .whereNotNull("propertyType")
@@ -58,6 +77,11 @@ router.get("/search", async (req, res) => {
 
         let query = db("data");
 
+        // check if value is a non-negative integer
+        const validateNonNegativeInteger = (value) => {
+            return Number.isInteger(Number(value)) && Number(value) >= 0;
+        };
+
         // suburb filter
         if (req.query.suburb) {
             query = query.where("suburb", "like", `%${req.query.suburb}%`);
@@ -69,47 +93,119 @@ router.get("/search", async (req, res) => {
         }
 
         // postcode filter
-        if (req.query.postcode) {
+        if (req.query.postcode !== undefined) {
+
+            if (!validateNonNegativeInteger(req.query.postcode) || Number(req.query.postcode) > 9999) {
+                return res.status(400).json({
+                    error: true,
+                    message: "Invalid postcode parameter. Must be an integer in the range of 0000-9999."
+                });
+            }
+
             query = query.where("postcode", Number(req.query.postcode));
         }
 
         // minimum rent filter
-        if (req.query.minimumRent) {
+        if (req.query.minimumRent !== undefined) {
+
+            if (!validateNonNegativeInteger(req.query.minimumRent)) {
+                return res.status(400).json({
+                    error: true,
+                    message: "Invalid minimumRent parameter. Must be a non-negative integer."
+                });
+            }
+
             query = query.where("rent", ">=", Number(req.query.minimumRent));
         }
 
         // maximum rent filter
-        if (req.query.maximumRent) {
+        if (req.query.maximumRent !== undefined) {
+
+            if (!validateNonNegativeInteger(req.query.maximumRent)) {
+                return res.status(400).json({
+                    error: true,
+                    message: "Invalid maximumRent parameter. Must be a non-negative integer."
+                });
+            }
+
             query = query.where("rent", "<=", Number(req.query.maximumRent));
         }
 
         // minimum bathrooms filter
-        if (req.query.minimumBathrooms) {
+        if (req.query.minimumBathrooms !== undefined) {
+
+            if (!validateNonNegativeInteger(req.query.minimumBathrooms)) {
+                return res.status(400).json({
+                    error: true,
+                    message: "Invalid minimumBathrooms parameter. Must be a non-negative integer."
+                });
+            }
+
             query = query.where("bathrooms", ">=", Number(req.query.minimumBathrooms));
         }
 
         // maximum bathrooms filter
-        if (req.query.maximumBathrooms) {
+        if (req.query.maximumBathrooms !== undefined) {
+
+            if (!validateNonNegativeInteger(req.query.maximumBathrooms)) {
+                return res.status(400).json({
+                    error: true,
+                    message: "Invalid maximumBathrooms parameter. Must be a non-negative integer."
+                });
+            }
+
             query = query.where("bathrooms", "<=", Number(req.query.maximumBathrooms));
         }
 
         // minimum bedrooms filter
-        if (req.query.minimumBedrooms) {
+        if (req.query.minimumBedrooms !== undefined) {
+
+            if (!validateNonNegativeInteger(req.query.minimumBedrooms)) {
+                return res.status(400).json({
+                    error: true,
+                    message: "Invalid minimumBedrooms parameter. Must be a non-negative integer."
+                });
+            }
+
             query = query.where("bedrooms", ">=", Number(req.query.minimumBedrooms));
         }
 
         // maximum bedrooms filter
-        if (req.query.maximumBedrooms) {
+        if (req.query.maximumBedrooms !== undefined) {
+
+            if (!validateNonNegativeInteger(req.query.maximumBedrooms)) {
+                return res.status(400).json({
+                    error: true,
+                    message: "Invalid maximumBedrooms parameter. Must be a non-negative integer."
+                });
+            }
+
             query = query.where("bedrooms", "<=", Number(req.query.maximumBedrooms));
         }
 
         // minimum parking filter
-        if (req.query.minimumParking) {
+        if (req.query.minimumParking !== undefined) {
+
+            if (!validateNonNegativeInteger(req.query.minimumParking)) {
+                return res.status(400).json({
+                    error: true,
+                    message: "Invalid minimumParking parameter. Must be a non-negative integer."
+                });
+            }
+
             query = query.where("parkingSpaces", ">=", Number(req.query.minimumParking));
         }
 
         // maximum parking filter
-        if (req.query.maximumParking) {
+        if (req.query.maximumParking !== undefined) {
+
+            if (!validateNonNegativeInteger(req.query.maximumParking)) {
+                return res.status(400).json({
+                    error: true,
+                    message: "Invalid maximumParking parameter. Must be a non-negative integer."
+                });
+            }
+
             query = query.where("parkingSpaces", "<=", Number(req.query.maximumParking));
         }
 
@@ -123,11 +219,53 @@ router.get("/search", async (req, res) => {
             query = query.whereIn("propertyType", propertyTypes);
         }
 
+        // sortOrder needs sortBy
+        if (req.query.sortOrder && !req.query.sortBy) {
+            return res.status(400).json({
+                error: true,
+                message: "Invalid sortOrder parameter. sortBy must be specified."
+            });
+        }
+
         // sorting field
         const sortBy = req.query.sortBy || "id";
 
         // sorting order
         const sortOrder = req.query.sortOrder || "asc";
+
+        // valid sorting fields
+        const validSortFields = [
+            "id",
+            "title",
+            "rent",
+            "propertyType",
+            "latitude",
+            "longitude",
+            "postcode",
+            "state",
+            "suburb",
+            "bathrooms",
+            "bedrooms",
+            "parkingSpaces",
+            "averageRating",
+            "numRatings"
+        ];
+
+        // validate sortBy
+        if (!validSortFields.includes(sortBy)) {
+            return res.status(400).json({
+                error: true,
+                message: "Invalid sortBy parameter. Must refer to a valid sortable property."
+            });
+        }
+
+        // validate sortOrder
+        if (!["asc", "desc"].includes(sortOrder)) {
+            return res.status(400).json({
+                error: true,
+                message: "Invalid sortOrder parameter. Must be 'asc' or 'desc'."
+            });
+        }
 
         // apply sorting
         query = query.orderBy(sortBy, sortOrder);
@@ -176,7 +314,7 @@ router.get("/search", async (req, res) => {
                 perPage,
                 currentPage: page,
                 from: (page - 1) * perPage,
-                to: page * perPage
+                to: Math.min(page * perPage, total)
             }
         });
 
@@ -193,6 +331,16 @@ router.get("/search", async (req, res) => {
 // GET /rentals/:id
 router.get("/:id", async (req, res) => {
     try {
+
+        const queryParams = Object.keys(req.query);
+
+        if (queryParams.length > 0) {
+            return res.status(400).json({
+                error: true,
+                message: `Invalid query parameters: ${queryParams.join(", ")}`
+            });
+        }
+
         const rental = await db("data")
             .where("id", req.params.id)
             .first();
