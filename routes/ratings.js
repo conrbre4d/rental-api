@@ -45,19 +45,65 @@ router.post("/rentals/:id", auth, async (req, res) => {
             });
         }
 
-        // insert rating
-        await db("ratings").insert({
-            rentalId,
-            userEmail,
-            rating,
-            comment
-        });
+        // check rental exists
+        const rental = await db("data")
+            .where("id", rentalId)
+            .first();
 
-        res.status(201).json({
-            rating,
-            comment,
-            dateTime: new Date().toISOString()
-        });
+        if (!rental) {
+            return res.status(404).json({
+                error: true,
+                message: "No rental exists with this ID."
+            });
+        }
+
+        // check if this user already rated this rental
+        const existingRating = await db("ratings")
+            .where({
+                rentalId,
+                userEmail
+            })
+            .first();
+
+        // insert or update rating
+        if (existingRating) {
+            await db("ratings")
+                .where({
+                    rentalId,
+                    userEmail
+                })
+                .update({
+                    rating,
+                    comment,
+                    dateTime: db.fn.now()
+                });
+        } else {
+            await db("ratings").insert({
+                rentalId,
+                userEmail,
+                rating,
+                comment
+            });
+        }
+
+        // get saved rating
+        const savedRating = await db("ratings")
+            .where({
+                rentalId,
+                userEmail
+            })
+            .first();
+
+        const response = {
+            rating: savedRating.rating,
+            dateTime: savedRating.dateTime
+        };
+
+        if (savedRating.comment) {
+            response.comment = savedRating.comment;
+        }
+
+        res.status(201).json(response);
 
     } catch (error) {
 
@@ -83,7 +129,10 @@ router.get("/rentals/:id", auth, async (req, res) => {
             .first();
 
         if (!rating) {
-            return res.json({});
+            return res.status(404).json({
+                error: true,
+                message: "No rating exists with this rental ID."
+            });
         }
 
         // send rating data
