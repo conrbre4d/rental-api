@@ -314,7 +314,7 @@ router.get("/search", async (req, res) => {
                 perPage,
                 currentPage: page,
                 from: (page - 1) * perPage,
-                to: Math.min(page * perPage, total)
+                to: page > Math.ceil(total / perPage) ? (page - 1) * perPage : Math.min(page * perPage, total)
             }
         });
 
