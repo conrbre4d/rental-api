@@ -142,6 +142,30 @@ router.get("/search", async (req, res) => {
             .limit(perPage)
             .offset((page - 1) * perPage);
 
+        // add rating data and fix number types
+        for (const rental of rentals) {
+
+            rental.latitude = Number(rental.latitude);
+            rental.longitude = Number(rental.longitude);
+
+            const ratings = await db("ratings")
+                .where("rentalId", rental.id);
+
+            rental.numRatings = ratings.length;
+
+            if (ratings.length > 0) {
+                let totalRating = 0;
+
+                for (const r of ratings) {
+                    totalRating += r.rating;
+                }
+
+                rental.averageRating = totalRating / ratings.length;
+            } else {
+                rental.averageRating = null;
+            }
+        }
+
         res.json({
             data: rentals,
             pagination: {
@@ -227,6 +251,9 @@ router.get("/:id", async (req, res) => {
 
             rental.averageRating = null;
         }
+
+        rental.latitude = Number(rental.latitude);
+        rental.longitude = Number(rental.longitude);
 
         res.json(rental);
 
