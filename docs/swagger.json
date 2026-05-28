@@ -278,9 +278,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "id", "title", "rent", "propertyType", "latitude", "longitude", "postcode", "state", "suburb", "bathrooms", "bedrooms", "parkingSpaces", "averageRating", "numRatings"
-              ]
+              "enum": ["id","title","rent","propertyType","latitude","longitude","postcode","state","suburb","bathrooms","bedrooms","parkingSpaces","averageRating","numRatings"]
             }
           },
           {
@@ -290,9 +288,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "asc", "desc"
-              ]
+              "enum": ["asc","desc"]
             }
           },
           {
@@ -367,7 +363,7 @@
                             "examples": [2]
                           },
                           "averageRating": {
-                            "type": ["number", "null"],
+                            "type": ["number","null"],
                             "examples": [3.5]
                           },
                           "numRatings": {
@@ -405,11 +401,11 @@
                           "examples": [677]
                         },
                         "prevPage": {
-                          "type": ["integer", "null"],
+                          "type": ["integer","null"],
                           "examples": [null]
                         },
                         "nextPage": {
-                          "type": ["integer", "null"],
+                          "type": ["integer","null"],
                           "examples": [2]
                         }
                       }
@@ -656,7 +652,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Returns an object containing title, rent, description, propertyType, locality, latitude, longitude, postcode, state, streetAddress, suburb, bathrooms, bedrooms, parkingSpaces, agencyName, amenities, averageRating and numRatings propertiers for the queried rental.",
+            "description": "Returns an object containing rental property data, averageRating, numRatings, and reviews for the queried rental.",
             "content": {
               "application/json": {
                 "schema": {
@@ -723,16 +719,55 @@
                       "examples": ["McGrath Estate Agents Aspley"]
                     },
                     "amenities": {
-                      "type": ["string", "null"],
+                      "type": ["string","null"],
                       "examples": ["Garage: 2, Air Conditioning"]
                     },
                     "averageRating": {
-                      "type": ["number", "null"],
+                      "type": ["number","null"],
                       "examples": [4.25]
                     },
                     "numRatings": {
                       "type": "integer",
                       "examples": [4]
+                    },
+                    "reviews": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "rating": {
+                            "type": "integer",
+                            "examples": [4]
+                          },
+                          "user": {
+                            "type": "string",
+                            "examples": ["john.doe@example.com"]
+                          },
+                          "comment": {
+                            "type": "string",
+                            "examples": ["Comfortable stay with good facilities."]
+                          },
+                          "dateTime": {
+                            "type": "string",
+                            "examples": ["2026-03-13T21:51:48.752Z"]
+                          }
+                        }
+                      },
+                      "examples": [
+                        [
+                          {
+                            "rating": 4,
+                            "user": "john.doe@example.com",
+                            "comment": "Comfortable stay with good facilities. A few minor issues, but I would consider staying again.",
+                            "dateTime": "2026-03-13T21:51:48.752Z"
+                          },
+                          {
+                            "rating": 4,
+                            "user": "t.chappell@example.com",
+                            "dateTime": "2026-04-12T08:19:28.374Z"
+                          }
+                        ]
+                      ]
                     }
                   }
                 }
@@ -837,16 +872,34 @@
                           "dateTime": {
                             "type": "string",
                             "examples": ["2026-03-14T23:47:45.371Z"]
+                          },
+                          "comment": {
+                            "type": "string",
+                            "examples": ["The property was acceptable overall, but some areas could have been cleaner."]
                           }
                         }
                       },
-                      "examples": [[
-                        {"rentalId": 1, "rating": 3, "dateTime": "2026-03-11T23:47:18.496Z"},
-                        {"rentalId": 17, "rating": 2, "dateTime": "2026-03-10T18:26:26.153Z"},
-                        {"rentalId": 100, "rating": 4, "dateTime": "2026-03-13T21:51:48.752Z"},
-                        {"rentalId": 1234, "rating": 3, "dateTime": "2026-03-09T17:39:35.365Z"},
-                        {"rentalId": 2000, "rating": 5, "dateTime": "2026-03-12T22:23:14.986Z"}
-                      ]]
+                      "examples": [
+                        [
+                          {
+                            "rentalId": 1,
+                            "rating": 3,
+                            "comment": "The property was acceptable overall, but some areas could have been cleaner.",
+                            "dateTime": "2026-03-11T23:47:18.496Z"
+                          },
+                          {
+                            "rentalId": 17,
+                            "rating": 2,
+                            "comment": "The location was convenient, but the property needed maintenance and was noisier than expected.",
+                            "dateTime": "2026-03-10T18:26:26.153Z"
+                          },
+                          {
+                            "rentalId": 1234,
+                            "rating": 3,
+                            "dateTime": "2026-03-09T17:39:35.365Z"
+                          }
+                        ]
+                      ]
                     },
                     "pagination": {
                       "type": "object",
@@ -860,11 +913,11 @@
                           "examples": [1]
                         },
                         "prevPage": {
-                          "type": ["integer", "null"],
+                          "type": ["integer","null"],
                           "examples": [null]
                         },
                         "nextPage": {
-                          "type": ["integer", "null"],
+                          "type": ["integer","null"],
                           "examples": [null]
                         },
                         "perPage": {
@@ -894,7 +947,7 @@
             "description": "Invalid query parameters.",
             "content": {
               "application/json": {
-                "schema":                     {
+                "schema": {
                   "type": "object",
                   "properties": {
                     "error": {
@@ -1009,10 +1062,22 @@
                     "dateTime": {
                       "type": "string",
                       "examples": ["2026-03-14T23:47:45.371Z"]
+                    },
+                    "comment": {
+                      "type": "string",
+                      "examples": ["Decent value for money, but the landlord was very intrusive and annoying."]
                     }
                   },
                   "examples": [
-                    {"rating": 3, "dateTime": "2026-03-11T23:47:18.496Z"}
+                    {
+                      "rating": 3,
+                      "comment": "Decent value for money, but the landlord was very intrusive and annoying.",
+                      "dateTime": "2026-03-11T23:47:18.496Z"
+                    },
+                    {
+                      "rating": 3,
+                      "dateTime": "2026-03-11T23:47:18.496Z"
+                    }
                   ]
                 }
               }
@@ -1141,7 +1206,7 @@
           }
         ],
         "requestBody": {
-          "description": "An object containing an integer from 1-5 indicating the rating to be given to the rental property.",
+          "description": "An object containing an integer from 1-5 indicating the rating, and an optional comment.",
           "required": true,
           "content": {
             "application/json": {
@@ -1150,7 +1215,13 @@
                 "properties": {
                   "rating": {
                     "type": "integer",
-                    "enum": [1, 2, 3, 4, 5]
+                    "enum": [1,2,3,4,5]
+                  },
+                  "comment": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000,
+                    "examples": ["Decent value for money, but the landlord was very intrusive and annoying."]
                   }
                 }
               }
@@ -1172,31 +1243,56 @@
                     "dateTime": {
                       "type": "string",
                       "examples": ["2026-03-14T23:47:45.371Z"]
+                    },
+                    "comment": {
+                      "type": "string",
+                      "examples": ["Decent value for money, but the landlord was very intrusive and annoying."]
                     }
                   },
                   "examples": [
-                    {"rating": 3, "dateTime": "2026-03-11T23:47:18.496Z"}
+                    {
+                      "rating": 3,
+                      "comment": "Decent value for money, but the landlord was very intrusive and annoying.",
+                      "dateTime": "2026-03-11T23:47:18.496Z"
+                    }
                   ]
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid rating.",
+            "description": "Invalid rating or comment.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "examples": [true]
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["Invalid rating. Rating must be an integer value between 1 and 5."]
+                        }
+                      }
                     },
-                    "message": {
-                      "type": "string",
-                      "examples": ["Invalid rating. Rating must be an integer value between 1 and 5."]
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["Invalid comment parameter. Comment must be a string 1-2000 characters long."]
+                        }
+                      }
                     }
-                  }
+                  ]
                 }
               }
             }
@@ -1478,6 +1574,527 @@
                 "schema": {
                   "type": "string",
                   "examples": ["Too many requests, please try again later."]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ratings/debugEraseRatings": {
+      "post": {
+        "tags": ["Debug"],
+        "description": "Erases every rating in the database. Used for testing.",
+        "responses": {
+          "200": {
+            "description": "All ratings successfully erased.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "examples": ["All ratings successfully erased."]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/debugLogin": {
+      "post": {
+        "tags": ["Debug"],
+        "description": "Same as /user/login, except the generated JWT expires in 1 second.",
+        "requestBody": {
+          "description": "The credentials of the user to log in.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "examples": ["mike@gmail.com"]
+                  },
+                  "password": {
+                    "type": "string",
+                    "examples": ["password"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Debug log in successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "examples": ["ajsonwebtoken"]
+                    },
+                    "tokenType": {
+                      "type": "string",
+                      "examples": ["Bearer"]
+                    },
+                    "expiresIn": {
+                      "type": "number",
+                      "examples": [1]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid log in request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "examples": [true]
+                    },
+                    "message": {
+                      "type": "string",
+                      "examples": ["Request body incomplete, both email and password are required"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Log in failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "examples": [true]
+                    },
+                    "message": {
+                      "type": "string",
+                      "examples": ["Incorrect email or password"]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{email}/profile": {
+      "get": {
+        "tags": ["User"],
+        "description": "Returns a user's profile information. If the bearer token belongs to the requested user, dob and address are also returned. If the request is unauthorised or belongs to a different user, only email, firstName and lastName are returned.",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "description": "The email address of the user profile to retrieve.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "examples": ["mike@gmail.com"]
+                    },
+                    "firstName": {
+                      "type": ["string","null"],
+                      "examples": ["Michael"]
+                    },
+                    "lastName": {
+                      "type": ["string","null"],
+                      "examples": ["Jordan"]
+                    },
+                    "dob": {
+                      "type": ["string","null"],
+                      "examples": ["1963-02-17"]
+                    },
+                    "address": {
+                      "type": ["string","null"],
+                      "examples": ["123 Fake Street, Springfield"]
+                    }
+                  }
+                },
+                "examples": {
+                  "publicProfile": {
+                    "summary": "Public profile",
+                    "value": {
+                      "email": "mike@gmail.com",
+                      "firstName": "Michael",
+                      "lastName": "Jordan"
+                    }
+                  },
+                  "ownProfile": {
+                    "summary": "Own profile",
+                    "value": {
+                      "email": "mike@gmail.com",
+                      "firstName": "Michael",
+                      "lastName": "Jordan",
+                      "dob": "1963-02-17",
+                      "address": "123 Fake Street, Springfield"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["Authorization header ('Bearer token') not found"]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["Authorization header is malformed"]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["JWT token has expired"]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["Invalid JWT token"]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "examples": [true]
+                    },
+                    "message": {
+                      "type": "string",
+                      "examples": ["User not found"]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "description": "Updates profile information for a user. Users can only update their own profile.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "description": "The email address of the user profile to update.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Profile fields to update.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["firstName","lastName","dob","address"],
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "examples": ["Michael"]
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "examples": ["Jordan"]
+                  },
+                  "dob": {
+                    "type": "string",
+                    "examples": ["1963-02-17"]
+                  },
+                  "address": {
+                    "type": "string",
+                    "examples": ["123 Fake Street, Springfield"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "examples": ["mike@gmail.com"]
+                    },
+                    "firstName": {
+                      "type": ["string","null"],
+                      "examples": ["Michael"]
+                    },
+                    "lastName": {
+                      "type": ["string","null"],
+                      "examples": ["Jordan"]
+                    },
+                    "dob": {
+                      "type": ["string","null"],
+                      "examples": ["1963-02-17"]
+                    },
+                    "address": {
+                      "type": ["string","null"],
+                      "examples": ["123 Fake Street, Springfield"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["Request body incomplete: firstName, lastName, dob and address are required."]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["Request body invalid: firstName, lastName and address must be strings only."]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["Invalid input: dob must be a real date in format YYYY-MM-DD."]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["Invalid input: dob must be a date in the past."]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["Authorization header ('Bearer token') not found"]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["Authorization header is malformed"]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["JWT token has expired"]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [true]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": ["Invalid JWT token"]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "examples": [true]
+                    },
+                    "message": {
+                      "type": "string",
+                      "examples": ["Forbidden"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "examples": [true]
+                    },
+                    "message": {
+                      "type": "string",
+                      "examples": ["User not found"]
+                    }
+                  }
                 }
               }
             }

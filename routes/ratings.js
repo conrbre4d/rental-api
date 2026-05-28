@@ -54,7 +54,9 @@ router.post("/rentals/:id", auth, async (req, res) => {
         });
 
         res.status(201).json({
-            message: "Rating added"
+            rating,
+            comment,
+            dateTime: new Date().toISOString()
         });
 
     } catch (error) {
