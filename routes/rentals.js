@@ -42,6 +42,20 @@ router.get("/property-types", async (req, res) => {
 router.get("/search", async (req, res) => {
     try {
 
+        // current page
+        const page = req.query.page ? Number(req.query.page) : 1;
+
+        // rentals per page
+        const perPage = 10;
+
+        // validate page
+        if (!Number.isInteger(page) || page < 1) {
+            return res.status(400).json({
+                error: true,
+                message: "Invalid page parameter. Must be an integer greater than or equal to 1."
+            });
+        }
+
         let query = db("data");
 
         // suburb filter
@@ -54,15 +68,93 @@ router.get("/search", async (req, res) => {
             query = query.where("state", req.query.state);
         }
 
-        // minimum bedrooms
-        if (req.query.bedrooms) {
-            query = query.where("bedrooms", ">=", req.query.bedrooms);
+        // postcode filter
+        if (req.query.postcode) {
+            query = query.where("postcode", Number(req.query.postcode));
         }
 
-        // limit results
-        const rentals = await query.limit(20);
+        // minimum rent filter
+        if (req.query.minimumRent) {
+            query = query.where("rent", ">=", Number(req.query.minimumRent));
+        }
 
-        res.json(rentals);
+        // maximum rent filter
+        if (req.query.maximumRent) {
+            query = query.where("rent", "<=", Number(req.query.maximumRent));
+        }
+
+        // minimum bathrooms filter
+        if (req.query.minimumBathrooms) {
+            query = query.where("bathrooms", ">=", Number(req.query.minimumBathrooms));
+        }
+
+        // maximum bathrooms filter
+        if (req.query.maximumBathrooms) {
+            query = query.where("bathrooms", "<=", Number(req.query.maximumBathrooms));
+        }
+
+        // minimum bedrooms filter
+        if (req.query.minimumBedrooms) {
+            query = query.where("bedrooms", ">=", Number(req.query.minimumBedrooms));
+        }
+
+        // maximum bedrooms filter
+        if (req.query.maximumBedrooms) {
+            query = query.where("bedrooms", "<=", Number(req.query.maximumBedrooms));
+        }
+
+        // minimum parking filter
+        if (req.query.minimumParking) {
+            query = query.where("parkingSpaces", ">=", Number(req.query.minimumParking));
+        }
+
+        // maximum parking filter
+        if (req.query.maximumParking) {
+            query = query.where("parkingSpaces", "<=", Number(req.query.maximumParking));
+        }
+
+        // property types filter
+        if (req.query.propertyTypes) {
+
+            const propertyTypes = Array.isArray(req.query.propertyTypes)
+                ? req.query.propertyTypes
+                : [req.query.propertyTypes];
+
+            query = query.whereIn("propertyType", propertyTypes);
+        }
+
+        // sorting field
+        const sortBy = req.query.sortBy || "id";
+
+        // sorting order
+        const sortOrder = req.query.sortOrder || "asc";
+
+        // apply sorting
+        query = query.orderBy(sortBy, sortOrder);
+
+        // total number of rentals
+        const countResult = await query.clone().count("* as count").first();
+
+        const total = Number(countResult.count);
+
+        // apply pagination
+        const rentals = await query
+            .limit(perPage)
+            .offset((page - 1) * perPage);
+
+        res.json({
+            data: rentals,
+            pagination: {
+                total,
+                lastPage: Math.ceil(total / perPage),
+                prevPage: page > 1 ? page - 1 : null,
+                nextPage: page < Math.ceil(total / perPage) ? page + 1 : null,
+                perPage,
+                currentPage: page,
+                from: (page - 1) * perPage,
+                to: page * perPage
+            }
+        });
 
     } catch (error) {
         console.error(error);
