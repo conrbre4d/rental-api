@@ -11,6 +11,9 @@ const ratingsRoutes = require("./routes/ratings");
 const swaggerUI = require("swagger-ui-express");
 const swaggerDocument = require("./docs/swagger.json");
 
+const https = require("https");
+const fs = require("fs");
+
 app.use(express.json());
 
 app.use("/docs", swaggerUI.serve);
@@ -41,6 +44,11 @@ app.use("/rentals", rentalsRoutes);
 app.use("/user", usersRoutes);
 app.use("/ratings", ratingsRoutes);
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+const credentials = {
+    key: fs.readFileSync("./certs/selfsigned.key"),
+    cert: fs.readFileSync("./certs/selfsigned.crt")
+};
+
+https.createServer(credentials, app).listen(PORT, () => {
+    console.log(`Server listening on https://localhost:${PORT}`);
 });
