@@ -20,7 +20,7 @@ app.use("/docs", swaggerUI.serve);
 app.get("/docs", swaggerUI.setup(swaggerDocument));
 
 app.get("/", (req, res) => {
-    res.json({ message: "Rental API is running" });
+    res.redirect("/docs");
 });
 
 app.get("/test-db", async (req, res) => {
@@ -50,5 +50,5 @@ const credentials = {
 };
 
 https.createServer(credentials, app).listen(PORT, () => {
-    console.log(`Server listening on https://localhost:${PORT}`);
+    console.log(`Server running on https://localhost:${PORT}`);
 });
