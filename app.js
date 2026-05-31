@@ -1,5 +1,4 @@
 const express = require("express");
-const db = require("./database/db");
 
 const app = express();
 const PORT = 3000;
@@ -21,23 +20,6 @@ app.get("/docs", swaggerUI.setup(swaggerDocument));
 
 app.get("/", (req, res) => {
     res.redirect("/docs");
-});
-
-app.get("/test-db", async (req, res) => {
-    try {
-        const [rows] = await db.raw("SELECT 1 + 1 AS result");
-
-        res.json({
-            message: "Database connected",
-            result: rows[0].result
-        });
-    } catch (error) {
-        console.error(error);
-
-        res.status(500).json({
-            error: "Database connection failed"
-        });
-    }
 });
 
 app.use("/rentals", rentalsRoutes);
