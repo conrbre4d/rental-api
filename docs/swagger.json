@@ -1399,7 +1399,7 @@
                   },
                   "password": {
                     "type": "string",
-                    "examples": ["password"]
+                    "examples": ["mike123"]
                   }
                 }
               }
@@ -1495,7 +1495,7 @@
                   },
                   "password": {
                     "type": "string",
-                    "examples": ["password"]
+                    "examples": ["mike123"]
                   }
                 }
               }
@@ -1623,7 +1623,7 @@
                   },
                   "password": {
                     "type": "string",
-                    "examples": ["password"]
+                    "examples": ["mike123"]
                   }
                 }
               }
